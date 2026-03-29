@@ -9,6 +9,7 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.client.RestTemplate;
 import reactor.core.publisher.Hooks;
 
@@ -27,8 +28,8 @@ public class AdministrationServiceApplication {
 
     @Bean
     @LoadBalanced
-    public RestTemplate getRestTemplate(){
-        return new RestTemplate();
+    public RestTemplate getRestTemplate(RestTemplateBuilder builder){
+        return builder.build();
     }
 
 }

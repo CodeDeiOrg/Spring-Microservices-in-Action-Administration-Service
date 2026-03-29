@@ -3,9 +3,12 @@ package com.onlinelibrary.administration.controller;
 import com.onlinelibrary.administration.exception.AdminControlException;
 import com.onlinelibrary.administration.requestmodel.AddBookRequest;
 import com.onlinelibrary.administration.service.AdminService;
-import com.onlinelibrary.administration.utils.ExtractJWT;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static com.onlinelibrary.administration.utils.Constants.*;
 
@@ -20,43 +23,43 @@ public class AdminController {
     }
 
     @PutMapping("/secure/increase/book/quantity")
-    public void increaseBookQuantity(@RequestHeader(value = "Authorization") String token,
+    public void increaseBookQuantity(@AuthenticationPrincipal Jwt jwt,
                                      @RequestParam Long bookId) {
-        String admin = ExtractJWT.payloadJWTExtraction(token, USER_TYPE);
-        if (admin == null || !admin.equals(ADMIN)) {
+        List<String> roles = jwt.getClaim(ROLES_CLAIM);
+        if (roles == null || !roles.contains(ADMIN)) {
             throw new AdminControlException(ADMINISTRATION_PAGE_ONLY);
         }
-        adminService.increaseBookQuantity(bookId, "", token);
+        adminService.increaseBookQuantity(bookId, "", "Bearer " + jwt.getTokenValue());
     }
 
     @PutMapping("/secure/decrease/book/quantity")
-    public void decreaseBookQuantity(@RequestHeader(value = "Authorization") String token,
+    public void decreaseBookQuantity(@AuthenticationPrincipal Jwt jwt,
                                      @RequestParam Long bookId) {
-        String admin = ExtractJWT.payloadJWTExtraction(token, USER_TYPE);
-        if (admin == null || !admin.equals(ADMIN)) {
+        List<String> roles = jwt.getClaim(ROLES_CLAIM);
+        if (roles == null || !roles.contains(ADMIN)) {
             throw new AdminControlException(ADMINISTRATION_PAGE_ONLY);
         }
-        adminService.decreaseBookQuantity(bookId, "", token);
+        adminService.decreaseBookQuantity(bookId, "", "Bearer " + jwt.getTokenValue());
     }
 
     @PostMapping("/secure/add/book")
-    public void postBook(@RequestHeader(value = "Authorization") String token,
+    public void postBook(@AuthenticationPrincipal Jwt jwt,
                          @RequestBody AddBookRequest addBookRequest) {
-        String admin = ExtractJWT.payloadJWTExtraction(token, USER_TYPE);
-        if (admin == null || !admin.equals(ADMIN)) {
+        List<String> roles = jwt.getClaim(ROLES_CLAIM);
+        if (roles == null || !roles.contains(ADMIN)) {
             throw new AdminControlException(ADMINISTRATION_PAGE_ONLY);
         }
-        adminService.postBook(addBookRequest, "", token);
+        adminService.postBook(addBookRequest, "", "Bearer " + jwt.getTokenValue());
     }
 
     @DeleteMapping("/secure/delete/book")
-    public void deleteBook(@RequestHeader(value = "Authorization") String token,
+    public void deleteBook(@AuthenticationPrincipal Jwt jwt,
                            @RequestParam Long bookId) {
-        String admin = ExtractJWT.payloadJWTExtraction(token, USER_TYPE);
-        if (admin == null || !admin.equals(ADMIN)) {
+        List<String> roles = jwt.getClaim(ROLES_CLAIM);
+        if (roles == null || !roles.contains(ADMIN)) {
             throw new AdminControlException(ADMINISTRATION_PAGE_ONLY);
         }
-        adminService.deleteBook(bookId, "", token);
+        adminService.deleteBook(bookId, "", "Bearer " + jwt.getTokenValue());
     }
 
 }
