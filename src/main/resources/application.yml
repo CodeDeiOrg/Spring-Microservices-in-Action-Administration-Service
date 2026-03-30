@@ -2,60 +2,9 @@ spring:
   application:
     name: administration-service
   profiles:
-    active: dev
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  cloud:
+    config:
+      uri: ${CONFIGSERVER_URI:http://localhost:8071}
   config:
-    import: "configserver:http://configserver:8071"
-
-logging:
-  level:
-    com.netflix: WARN
-    org.springframework.web: WARN
-    com.onlinelibrary: DEBUG
-
-resilience4j.circuitbreaker:
-  instances:
-    administrationService:
-      registerHealthIndicator: true
-      sliding-window-size: 5
-      permitted-number-of-calls-in-half-open-state: 3
-      waitDurationInOpenState: 10s
-      failureRateThreshold: 50
-      recordExceptions:
-        - org.springframework.web.client.HttpServerErrorException
-        - java.io.IOException
-        - java.util.concurrent.TimeoutException
-        - org.springframework.web.client.ResourceAccessException
-    bookService:
-      registerHealthIndicator: true
-      sliding-window-size: 5
-      permitted-number-of-calls-in-half-open-state: 3
-      waitDurationInOpenState: 20s
-      failureRateThreshold: 60
-
-resilience4j.ratelimiter:
-  instances:
-    administrationService:
-      limitForPeriod: 5
-      limitRefreshPeriod: 5000
-      timeoutDuration: 1000ms
-
-resilience4j.retry:
-  instances:
-    retryAdministrationService:
-      max-attempts: 5
-      waitDuration: 10000
-      retry-exceptions:
-        - java.util.concurrent.TimeoutException
-
-resilience4j.bulkhead:
-  instances:
-    bulkheadAdministrationService:
-      maxWaitDuration: 2ms
-      maxConcurrentCalls: 20
-
-resilience4j.thread-pool-bulkhead:
-  instances:
-    bulkheadAdministrationService:
-      maxThreadPoolSize: 1
-      coreThreadPoolSize: 1
-      queueCapacity: 1
+    import: "configserver:"
